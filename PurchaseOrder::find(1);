@@ -1,0 +1,13 @@
+[90m= [39m[34;4mApp\Models\PurchaseOrder[39;24m {#6850
+    [34mid[39m: [35m1[39m,
+    [34mvoucher_type[39m: "[32mFactura[39m",
+    [34mserie[39m: "[32mOC01[39m",
+    [34mcorrelative[39m: [35m1[39m,
+    [34mdate[39m: "[32m2025-07-10 00:00:00[39m",
+    [34msupplier_id[39m: [35m1[39m,
+    [34mtotal[39m: "[32m576.87[39m",
+    [34mobservation[39m: "[32mXD[39m",
+    [34mcreated_at[39m: "[32m2025-07-10 14:20:45[39m",
+    [34mupdated_at[39m: "[32m2025-07-10 14:20:45[39m",
+  }
+

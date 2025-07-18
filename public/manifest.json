@@ -1,0 +1,16 @@
+{
+    "name": "Betegar",
+    "short_name": "Betegar",
+    "background_color": "#ef1515ff",
+    "display": "standalone",
+    "description": "Toda tu info en un solo lugar",
+    "theme_color": "#ef1515ff",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
