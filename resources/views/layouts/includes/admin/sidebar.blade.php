@@ -172,13 +172,44 @@
         ],
 
         // sección “Banca”
-        new MenuHeader('Banca'),
+       new MenuHeader('Banca'),
+[
+    'name'   => 'Banca',
+    'icon'   => 'fa-solid fa-piggy-bank',
+    'href'   => '#',
+    'active' => request()->routeIs([
+        'admin.expense-categories.*',
+        'admin.bank-accounts.*',
+        'admin.bank-transactions.*',
+        'admin.sales.payments.*',
+    ]),
+    'children' => [
         [
-            'name'   => 'Banca',
+            'name'   => 'Categorías de gasto',
+            'icon'   => 'fa-solid fa-list',
+            'href'   => route('admin.expense-categories.index'),
+            'active' => request()->routeIs('admin.expense-categories.*'),
+        ],
+        [
+            'name'   => 'Cuentas bancarias',
             'icon'   => 'fa-solid fa-piggy-bank',
-            'href'   => '',
+            'href'   => route('admin.bank-accounts.index'),
+            'active' => request()->routeIs('admin.bank-accounts.*'),
+        ],
+        [
+            'name'   => 'Movimientos bancarios',
+            'icon'   => 'fa-solid fa-money-check-dollar',
+            'href'   => route('admin.bank-transactions.index'),
+            'active' => request()->routeIs('admin.bank-transactions.*'),
+        ],
+        [
+            'name'   => 'Pagos de ventas',
+            'icon'   => 'fa-solid fa-hand-holding-dollar',
+             'href'   => '',
             'active' => false,
         ],
+    ],
+],
 
         // sección “Configuración”
         new MenuHeader('Configuración'),

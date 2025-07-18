@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\MovementController;
 use App\Http\Controllers\Admin\TransferController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ExpenseCategoryController;
+use App\Http\Controllers\Admin\BankAccountController;
+use App\Http\Controllers\Admin\BankTransactionController;
 
 Route::get('/', function () {
    return view('admin.dashboard');
@@ -84,3 +87,21 @@ Route::get('reports/top-customers', [ReportController::class, 'topCustomers'])
     ->name('reports.top-customers');
 Route::get('reports/low-stock', [ReportController::class, 'lowStock'])
     ->name('reports.low-stock');
+
+    // ——————— Expense Categories ———————
+Route::resource('expense-categories', ExpenseCategoryController::class)
+     ->except(['show']);
+
+// ——————— Bank Accounts ———————
+Route::resource('bank-accounts', BankAccountController::class)
+     ->except(['show']);
+
+// ——————— Bank Transactions ———————
+Route::resource('bank-transactions', BankTransactionController::class)
+     ->only(['index','create','store','destroy']);
+
+// ——————— Sale Payments (Anticipos / Abonos) ———————
+// Nested under sales, but with shallow routes for convenience
+Route::resource('sales.payments', SalePaymentController::class)
+     ->shallow()
+     ->only(['index','create','store','destroy']);

@@ -50,4 +50,17 @@ public function inventories()
 {
     return $this->morphMany(Inventory::class, 'inventoryable');
 }
+public function payments()
+{
+    return $this->hasMany(SalePayment::class);
+}
+public function getPaidAmountAttribute(): float
+{
+    return $this->payments()->sum('amount');
+}
+public function getDueAmountAttribute(): float
+{
+    return $this->total - $this->paid_amount;
+}
+
 }
