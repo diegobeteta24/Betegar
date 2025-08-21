@@ -11,6 +11,9 @@
         <x-wire-button href="{{ route('admin.purchase-orders.create') }}" blue>
             Nuevo
         </x-wire-button>
+        <x-wire-button href="{{ route('admin.purchase-orders.import') }}" purple>
+            Importar
+        </x-wire-button>
     </x-slot>
 
     @livewire('admin.datatables.purchase-order-table')

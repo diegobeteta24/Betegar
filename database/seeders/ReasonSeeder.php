@@ -29,7 +29,7 @@ class ReasonSeeder extends Seeder
         ];
 
         foreach ($reasons as $reason) {
-            Reason::Create($reason);
+            Reason::firstOrCreate(['name' => $reason['name'], 'type' => $reason['type']], $reason);
         }
     }
 }

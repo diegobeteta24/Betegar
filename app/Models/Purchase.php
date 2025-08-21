@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model; use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
+    use SoftDeletes;
      protected $fillable = [
         'voucher_type',
         'serie',
@@ -14,6 +15,7 @@ class Purchase extends Model
         'purchase_order_id',
         'supplier_id',
         'warehouse_id',
+    'bank_account_id',
         'total',
         'observation',
     ];

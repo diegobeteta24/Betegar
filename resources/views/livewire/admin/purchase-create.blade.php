@@ -92,6 +92,22 @@
             class="w-full"
           />
         </div>
+
+        <div class="col-span-1 lg:col-span-2">
+          <x-wire-select
+            label="Cuenta Bancaria (opcional)"
+            wire:model="bank_account_id"
+            placeholder="Seleccione una cuenta bancaria"
+            :async-data="[
+              'api'    => route('api.bank-accounts.index'),
+              'method' => 'POST',
+            ]"
+            option-label="name"
+            option-value="id"
+            class="w-full"
+            hint="Si seleccionas una cuenta se generará un débito automático"
+          />
+        </div>
       </div>
 
       <!-- FLEX: columna en sm, fila en lg -->

@@ -30,6 +30,15 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * Formulario importación masiva de órdenes de compra.
+     */
+    public function import(Request $request)
+    {
+        $this->authorize('purchase-order.import');
+        return view('admin.purchase_orders.import');
+    }
+
+    /**
      * PDF generation for purchase orders.
      */
    public function pdf(PurchaseOrder $purchaseOrder)

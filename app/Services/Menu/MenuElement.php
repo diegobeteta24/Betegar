@@ -1,16 +1,19 @@
 <?php
-// app/Services/Menu/MenuElement.php
+
 namespace App\Services\Menu;
 
+/**
+ * Interfaz base para todos los elementos del menú.
+ */
 interface MenuElement
 {
-    /** 
-     * Renderiza este elemento como HTML 
+    /**
+     * Devuelve el HTML a renderizar.
      */
     public function render(): string;
 
     /**
-     * Controla si el usuario puede verlo
+     * Controla si el elemento se muestra o no.
      */
     public function authorize(): bool;
 }

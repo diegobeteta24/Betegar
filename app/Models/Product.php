@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Category;
 use App\Models\PurchaseOrder;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     
       protected $fillable = [
         'name',
@@ -26,7 +27,28 @@ class Product extends Model
         'price',
         'category_id',
         'stock',
+        'type', // product | service
     ];
+
+    protected $attributes = [
+        'type' => 'product',
+    ];
+
+    // Helpers
+    public function scopeProducts($query)
+    {
+        return $query->where('type', 'product');
+    }
+
+    public function scopeServices($query)
+    {
+        return $query->where('type', 'service');
+    }
+
+    public function getIsServiceAttribute(): bool
+    {
+        return $this->type === 'service';
+    }
 
     protected function image(): Attribute
     {

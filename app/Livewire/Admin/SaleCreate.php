@@ -26,6 +26,9 @@ public $total = 0;
 public $observation;
 public $product_id;
 public $products = [];
+public $discount_percent = 0;
+public $subtotal = 0;
+public $discount_amount = 0;
 
 public function boot()
 {
@@ -63,26 +66,29 @@ public function boot()
 
 public function updated($property, $value)
 {
-   if ($property === 'quote_id') {
-
-    $quote = Quote::find($value);
-
-    if ($quote) {
-
-        $this->voucher_type = $quote->voucher_type;
-        $this->customer_id = $quote->customer_id;
-        
-        $this->products = $quote->products->map(function ($product) {
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'quantity' => $product->pivot->quantity,
-                'price' => $product->pivot->price,
-                'subtotal' => $product->pivot->quantity * $product->pivot->price,
-            ];
-        })->toArray();
+    if ($property === 'quote_id') {
+        $quote = Quote::with('products')->find($value);
+        if ($quote) {
+            $this->voucher_type = $quote->voucher_type;
+            $this->customer_id = $quote->customer_id;
+            $this->discount_percent = $quote->discount_percent ?? 0;
+            $this->discount_amount = $quote->discount_amount ?? 0;
+            $this->subtotal = $quote->subtotal ?? 0;
+            $this->total = $quote->total ?? 0;
+            // map including type & description for service detection
+            $this->products = $quote->products->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'quantity' => $product->pivot->quantity,
+                    'price' => $product->pivot->price,
+                    'subtotal' => $product->pivot->quantity * $product->pivot->price,
+                    'is_service' => $product->type === 'service',
+                    'description' => $product->pivot->description ?? null,
+                ];
+            })->toArray();
+        }
     }
-}
 }
 public function addProduct()
 {
@@ -116,36 +122,46 @@ public function addProduct()
             'quantity' => 1, // Default quantity
             'price' => $product->price,
             'subtotal' => $product->price, // Default subtotal
-            
+            'is_service' => $product->type === 'service',
+            'description' => $product->name,
         ];
 
         $this->reset('product_id'); // Reset product selection
+    $this->recalculateTotals();
 
 }
 
 public function save()
 {
-    $this->validate([
+    // detect if there are any products that are not services
+    $hasPhysical = collect($this->products)->contains(fn($p)=> empty($p['is_service']));
+
+    $rules = [
         'voucher_type' => 'required|in:1,2',
         'serie' => 'required|string|max:10',
-        'correlative' => 'required|numeric|max:10',
+        'correlative' => 'required|numeric',
         'date' => 'nullable|date',
         'quote_id' => 'nullable|exists:quotes,id',
         'customer_id' => 'required|exists:customers,id',
-        'warehouse_id' => 'required|exists:warehouses,id',
         'total' => 'required|numeric|min:0',
         'observation' => 'nullable|string|max:255',
         'products' => 'required|array|min:1',
         'products.*.id' => 'required|exists:products,id',
         'products.*.quantity' => 'required|numeric|min:1',
         'products.*.price' => 'required|numeric|min:0',
-    
-    ], [], [
+    ];
+    if($hasPhysical){
+        $rules['warehouse_id'] = 'required|exists:warehouses,id';
+    } else {
+        $rules['warehouse_id'] = 'nullable';
+    }
+    $this->validate($rules, [], [
         'voucher_type' => 'Tipo de Documento',
         'serie' => 'Serie',
         'correlative' => 'Correlativo',
         'date' => 'Fecha',
         'customer_id' => 'Cliente',
+        'warehouse_id' => 'Almacén',
         'total' => 'Total',
         'observation' => 'Observación',
         'products' => 'Productos',
@@ -153,6 +169,12 @@ public function save()
         'products.*.quantity' => 'Cantidad',
         'products.*.price' => 'Precio',
     ]);
+
+    $this->recalculateTotals();
+
+    if(!$hasPhysical){
+        $this->warehouse_id = null; // ensure null persists
+    }
 
     $sale = Sale::create([
         'voucher_type' => $this->voucher_type,
@@ -162,6 +184,9 @@ public function save()
         'quote_id' => $this->quote_id,
         'customer_id' => $this->customer_id,
         'warehouse_id' => $this->warehouse_id,
+        'subtotal' => $this->subtotal,
+        'discount_percent' => $this->discount_percent,
+        'discount_amount' => $this->discount_amount,
         'total' => $this->total,
         'observation' => $this->observation,
     ]);
@@ -171,11 +196,12 @@ public function save()
             'quantity' => $product['quantity'],
             'price' => $product['price'],
             'subtotal' => $product['quantity'] * $product['price'],
+            'description' => $product['description'] ?? null,
         ]);
-
-        //Kardex for Sale
-        Kardex::registerExit($sale, $product, $this->warehouse_id, 'Venta de producto');
-
+        // Kardex only for physical products
+        if(empty($product['is_service']) && $this->warehouse_id){
+            Kardex::registerExit($sale, $product, $this->warehouse_id, 'Venta de producto');
+        }
     }
 
     return redirect()
@@ -188,6 +214,14 @@ public function save()
             'showConfirmButton' => false,
         ]);
 
+}
+public function updatedDiscountPercent(){ $this->recalculateTotals(); }
+public function updatedProducts(){ $this->recalculateTotals(); }
+protected function recalculateTotals(): void
+{
+    $this->subtotal = collect($this->products)->sum(fn($p)=> (float)$p['quantity'] * (float)$p['price']);
+    $this->discount_amount = round($this->subtotal * ($this->discount_percent/100), 2);
+    $this->total = max($this->subtotal - $this->discount_amount, 0);
 }
     public function render()
     {

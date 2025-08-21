@@ -51,6 +51,9 @@ class QuotesExport implements
             $quote->correlative,
             $quote->date->format('d/m/Y'),
             optional($quote->customer)->name,
+            number_format($quote->subtotal, 2),
+            number_format($quote->discount_percent,2).'%',
+            number_format($quote->discount_amount,2),
             number_format($quote->total, 2),
             $quote->observation,
             $quote->created_at->format('d/m/Y'),
@@ -69,6 +72,9 @@ class QuotesExport implements
             'Correlativo',
             'Fecha',
             'Cliente',
+            'Subtotal',
+            'Desc %',
+            'Desc Monto',
             'Total',
             'Observación',
             'Creado el',
@@ -80,7 +86,8 @@ class QuotesExport implements
      */
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:I1')->applyFromArray([
+    $lastCol = 'L';
+    $sheet->getStyle("A1:$lastCol"."1")->applyFromArray([
             'font' => [
                 'bold'  => true,
                 'color' => ['argb' => 'FFFFFFFF'],

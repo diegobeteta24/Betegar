@@ -16,6 +16,8 @@ class BankTransaction extends Model
         'date',
         'amount',
         'description',
+        'origin_type',
+        'origin_id',
     ];
 
     protected $casts = [

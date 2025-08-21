@@ -27,6 +27,15 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Formulario importación masiva de compras.
+     */
+    public function import(Request $request)
+    {
+        $this->authorize('purchase.import');
+        return view('admin.purchases.import');
+    }
+
+    /**
      * PDF generation for purchases.
      */
 

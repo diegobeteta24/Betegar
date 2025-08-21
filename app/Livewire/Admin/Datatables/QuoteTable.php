@@ -109,6 +109,7 @@ return [
         return Excel::download(new QuotesExport($quotes), 'cotizaciones.xlsx');
     }
 
+
    
     //Properties
     public $form =[

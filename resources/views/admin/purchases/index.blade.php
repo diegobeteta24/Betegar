@@ -10,6 +10,9 @@
         <x-wire-button href="{{ route('admin.purchases.create') }}" blue>
             Nuevo
         </x-wire-button>
+        <x-wire-button href="{{ route('admin.purchases.import') }}" purple>
+            Importar
+        </x-wire-button>
     </x-slot>
 
     @livewire('admin.datatables.purchase-table')

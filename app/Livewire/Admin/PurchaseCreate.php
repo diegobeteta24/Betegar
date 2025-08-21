@@ -17,6 +17,7 @@ class PurchaseCreate extends Component
     public $purchase_order_id;
     public $supplier_id;
     public $warehouse_id;
+    public $bank_account_id; // Nueva cuenta bancaria asociada
     public $total = 0;
     public $observation;
     public $product_id;
@@ -109,6 +110,7 @@ class PurchaseCreate extends Component
             'purchase_order_id'  => 'nullable|exists:purchase_orders,id',
             'supplier_id'        => 'required|exists:suppliers,id',
             'warehouse_id'       => 'required|exists:warehouses,id',
+            'bank_account_id'    => 'nullable|exists:bank_accounts,id',
             'total'              => 'required|numeric|min:0',
             'observation'        => 'nullable|string|max:255',
             'products'           => 'required|array|min:1',
@@ -122,6 +124,7 @@ class PurchaseCreate extends Component
             'date'                => 'Fecha',
             'supplier_id'         => 'Proveedor',
             'warehouse_id'        => 'Almacén',
+            'bank_account_id'     => 'Cuenta Bancaria',
             'total'               => 'Total',
             'observation'         => 'Observación',
             'products'            => 'Productos',
@@ -139,6 +142,7 @@ class PurchaseCreate extends Component
             'purchase_order_id' => $this->purchase_order_id,
             'supplier_id'       => $this->supplier_id,
             'warehouse_id'      => $this->warehouse_id,
+            'bank_account_id'   => $this->bank_account_id,
             'total'             => $this->total,
             'observation'       => $this->observation,
         ]);

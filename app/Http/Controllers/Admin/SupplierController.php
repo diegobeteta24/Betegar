@@ -165,4 +165,18 @@ class SupplierController extends Controller
                 'showConfirmButton' => false,
             ]);
     }
+
+    /**
+     * Formulario de importación masiva vía Excel.
+     */
+    public function import(Request $request)
+    {
+        // Autorizamos usando permiso dedicado si existe, de lo contrario fallback a create
+        if (\Illuminate\Support\Facades\Gate::has('supplier.import')) {
+            \Illuminate\Support\Facades\Gate::authorize('supplier.import', Supplier::class);
+        } else {
+            \Illuminate\Support\Facades\Gate::authorize('supplier.create', Supplier::class);
+        }
+        return view('admin.suppliers.import');
+    }
 }

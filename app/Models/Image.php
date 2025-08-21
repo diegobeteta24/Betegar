@@ -9,12 +9,19 @@ class Image extends Model
      protected $fillable = [
         'path',
         'size',
+        'tag',
         'imageable_id',
         'imageable_type',
     ];
     
     public function imageable()
-{
-    return $this->morphTo();
-}
+    {
+        return $this->morphTo();
+    }
+
+    // Scopes
+    public function scopeSignature($query)
+    {
+        return $query->where('tag', 'signature');
+    }
 }

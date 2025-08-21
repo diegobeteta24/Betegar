@@ -1,9 +1,12 @@
 <?php
-// app/Services/Menu/MenuHeader.php
+
 namespace App\Services\Menu;
 
 use Illuminate\Contracts\Support\Htmlable;
 
+/**
+ * Representa un encabezado de sección en el sidebar.
+ */
 class MenuHeader implements MenuElement, Htmlable
 {
     protected string $title;
@@ -14,7 +17,7 @@ class MenuHeader implements MenuElement, Htmlable
     }
 
     /**
-     * Devuelve el <li> completo con el título.
+     * Renderiza la vista parcial de header (sin <li>).
      */
     public function render(): string
     {
@@ -23,19 +26,16 @@ class MenuHeader implements MenuElement, Htmlable
         ])->render();
     }
 
-    /** Para que {!! $link !!} también funcione */
     public function toHtml(): string
     {
         return $this->render();
     }
 
-    /** Control de permisos (siempre true en este ejemplo) */
     public function authorize(): bool
     {
         return true;
     }
 
-    /** Permite castear a string */
     public function __toString(): string
     {
         return $this->render();

@@ -7,6 +7,7 @@ use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Movement;
+use Illuminate\Support\Facades\Gate;
 
 class MovementController extends Controller
 {
@@ -15,6 +16,7 @@ class MovementController extends Controller
      */
     public function index()
     {
+        Gate::authorize('movement.view', Movement::class);
       
         return view('admin.movements.index');
     }

@@ -1,3 +1,6 @@
+@php
+    if(!auth()->user()->hasRole('admin')) abort(403, 'Solo administradores');
+@endphp
 <x-admin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">

@@ -23,9 +23,7 @@ class IdentitySeeder extends Seeder
         ];
 
         foreach ($identities as $identity) {
-            Identity::create([
-                'name' => $identity,
-            ]);
+            Identity::firstOrCreate(['name' => $identity]);
         }
     }
 }

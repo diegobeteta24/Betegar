@@ -1,16 +1,23 @@
-{{-- resources/views/admin/sales/index.blade.php --}}
+{{-- resources/views/admin/bank_accounts/index.blade.php --}}
 <x-admin-layout
-    title="Ventas | Betegar"
+    title="Cuentas Bancarias | Betegar"
     :breadcrumbs="[
         ['name' => 'Dashboard', 'href' => route('admin.dashboard')],
-        ['name' => 'Banco', 'href' => route('admin.bank-accounts.index')],
+        ['name' => 'Cuentas Bancarias', 'href' => route('admin.bank-accounts.index')],
     ]"
 >
     <x-slot name="action">
-        <x-wire-button href="{{ route('admin.bank-accounts.create') }}" blue>
-            Nuevo
-        </x-wire-button>
+        <div class="flex gap-2">
+            <x-wire-button href="{{ route('admin.bank-accounts.import') }}" gray>
+                <i class="fas fa-file-import"></i>
+                Importar
+            </x-wire-button>
+            <x-wire-button href="{{ route('admin.bank-accounts.create') }}" blue>
+                Nueva cuenta
+            </x-wire-button>
+        </div>
     </x-slot>
 
-    @livewire('admin.datatables.sale-table')
+    @livewire('admin.datatables.bank-account-table')
+
 </x-admin-layout>

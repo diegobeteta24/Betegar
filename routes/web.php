@@ -1,33 +1,29 @@
 <?php
 
+// (REMOVED) Comentarios y rutas públicas que producían salida antes de la etiqueta PHP, rompiendo respuestas JSON de Livewire.
+
 use Illuminate\Support\Facades\Route;
-use App\Models\Productable;
 
-       
-Route::redirect('/', '/admin');
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+use App\Http\Controllers\WorkOrderController;
+use Illuminate\Support\Facades\Route as WebRoute;
+use App\Http\Controllers\PublicQuoteController;
+
+//Redirigir a dashboard operativo (no admin)
+Route::get('/', function () {
+   return view('dashboard');
+  
+})->name('dashboard');
+
+// Cotización pública individual
+Route::get('/cotizacion/{token}', [PublicQuoteController::class, 'show'])->name('public.quote.show');
+
+// Work Orders pages (protected by web+auth via bootstrap routing)
+Route::get('/work-orders/{workOrder}', [WorkOrderController::class, 'showPage'])
+   ->name('work-orders.show');
+
+// Página para registrar gastos (técnicos)
+WebRoute::middleware(['web','auth'])->group(function(){
+   WebRoute::view('/expenses/create', 'expenses.create')->name('expenses.create');
 });
 
-Route::get('/prueba', function () {
-   return Productable::where('productable_type', 'App\Models\Sale')
-   ->join('products', 'productables.product_id', '=', 'products.id')
-   ->selectRaw('
-       products.id as product_id,
-       products.name as name,
-       products.description as description,
-       SUM(productables.quantity) as quantity,
-       SUM(productables.subtotal) as subtotal
-   ')
-    ->groupBy('products.id', 'products.name', 'products.description')
-    ->orderBy('subtotal', 'desc')
-   ->get();
-   
-})->name('prueba');

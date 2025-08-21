@@ -25,7 +25,7 @@ class ProductsImport implements ToCollection, WithHeadingRow
             $validator= Validator::make($data, [
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'sku' => 'required|string|max:100|unique:products,sku',
+                'sku' => 'nullable|string|max:100|unique:products,sku',
                 'price' => 'required|numeric|min:0',
                 'category_id' => 'required|exists:categories,id',
             ]);
@@ -38,6 +38,7 @@ class ProductsImport implements ToCollection, WithHeadingRow
                 continue; // Skip this row if validation fails
             }
             
+         $data['type'] = 'product';
          Product::create($data);
          $this->importedCount++;
 

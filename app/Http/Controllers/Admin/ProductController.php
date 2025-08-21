@@ -43,6 +43,8 @@ class ProductController extends Controller
             'category_id'  => ['required','exists:categories,id'],
         ]);
 
+    $data['type'] = 'product';
+
         // 2. Crear el producto
         $product = Product::create($data);
 
@@ -82,6 +84,8 @@ class ProductController extends Controller
             'category_id' => ['required','exists:categories,id'],
         ]);
 
+    $data['type'] = 'product';
+
         // 2. Actualizar
         $product->update($data);
 
@@ -101,41 +105,94 @@ class ProductController extends Controller
      */
 public function destroy(Product $product)
 {
-    // 1. Verificar relaciones antes de eliminar
-    $relations = [
-        'inventarios'       => $product->inventories()->exists(),
-        'órdenes de compra' => $product->purchaseOrders()->exists(),
-        'cotizaciones'      => $product->quotes()->exists(),
-        // 'imágenes'          => $product->images()->exists(),
-    ];
-
-    // Filtrar sólo las que tengan datos
-    $blocked = array_keys(array_filter($relations));
-
-    if (count($blocked)) {
-        // Construir texto dinámico
-        $list = implode(', ', $blocked);
-        return redirect()
-            ->route('admin.products.index')
-            ->with('sweet-alert', [
-                'icon'    => 'error',
-                'title'   => '¡No se puede eliminar!',
-                'text'    => "Este producto tiene registros en: {$list}.",
-                'showConfirmButton' => true,
-            ]);
-    }
-
-    // 2. Si no tiene ninguna relación, eliminarlo
+    // Soft delete (papelera). Permitimos aunque tenga relaciones para preservar integridad.
     $product->delete();
 
-    // 3. Redirigir con alerta de éxito
     return redirect()
         ->route('admin.products.index')
         ->with('sweet-alert', [
             'icon'    => 'success',
-            'title'   => '¡Producto eliminado!',
-            'text'    => 'El producto ha sido eliminado correctamente.',
+            'title'   => '¡Producto enviado a papelera!',
+            'text'    => 'Puedes restaurarlo o eliminarlo definitivamente luego.',
             'timer'   => 3000,
+            'showConfirmButton' => false,
+        ]);
+}
+
+    /**
+     * Restaurar un producto eliminado (soft delete)
+     */
+    public function restore($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        if (!$product->trashed()) {
+            return redirect()->route('admin.products.index')->with('sweet-alert', [
+                'icon' => 'info',
+                'title' => 'El producto ya estaba activo',
+                'timer' => 2500,
+                'showConfirmButton' => false,
+            ]);
+        }
+
+        $product->restore();
+
+        return redirect()->route('admin.products.index')->with('sweet-alert', [
+            'icon' => 'success',
+            'title' => '¡Producto restaurado!',
+            'timer' => 2500,
+            'showConfirmButton' => false,
+        ]);
+    }
+
+    /**
+     * Eliminación definitiva (force delete)
+     */
+    public function forceDelete($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+
+        if (!$product->trashed()) {
+            return redirect()->route('admin.products.index')->with('sweet-alert', [
+                'icon' => 'error',
+                'title' => 'Acción inválida',
+                'text' => 'El producto no está en papelera.',
+                'showConfirmButton' => true,
+            ]);
+        }
+
+        // Verificar relaciones antes de borrar definitivamente
+        $relations = [
+            'inventarios'       => method_exists($product, 'inventories') ? $product->inventories()->exists() : false,
+            'órdenes de compra' => method_exists($product, 'purchaseOrders') ? $product->purchaseOrders()->exists() : false,
+            'cotizaciones'      => method_exists($product, 'quotes') ? $product->quotes()->exists() : false,
+        ];
+        $blocked = array_keys(array_filter($relations));
+        if (count($blocked)) {
+            $list = implode(', ', $blocked);
+            return redirect()->route('admin.products.index')->with('sweet-alert', [
+                'icon' => 'error',
+                'title' => 'No se puede eliminar definitivamente',
+                'text' => "Existen registros en: {$list}.",
+                'showConfirmButton' => true,
+            ]);
+        }
+
+        // Borrar archivos asociados (imágenes) antes de force delete
+        if (method_exists($product, 'images')) {
+            foreach ($product->images as $img) {
+                if ($img->path) {
+                    \Illuminate\Support\Facades\Storage::delete($img->path);
+                }
+                $img->delete();
+            }
+        }
+
+        $product->forceDelete();
+
+        return redirect()->route('admin.products.index')->with('sweet-alert', [
+            'icon' => 'success',
+            'title' => '¡Producto eliminado definitivamente!',
+            'timer' => 2500,
             'showConfirmButton' => false,
         ]);
     }

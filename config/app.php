@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'asset_url' => env('ASSET_URL'),
 
     /*
     |--------------------------------------------------------------------------
@@ -66,6 +67,12 @@ return [
     */
 
     'timezone' => 'America/Guatemala',
+    
+        // Custom: local timezone used for business rules (Guatemala)
+        'tz_guatemala' => env('APP_TZ_GT', 'America/Guatemala'),
+    
+        // Custom: technician daily check-in cutoff (HH:MM:SS in 24h, Guatemala time)
+        'checkin_cutoff' => env('TECHNICIAN_CHECKIN_CUTOFF', '09:10:00'),
 
     /*
     |--------------------------------------------------------------------------

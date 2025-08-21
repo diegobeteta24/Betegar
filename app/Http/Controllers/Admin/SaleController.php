@@ -39,4 +39,13 @@ class SaleController extends Controller
         return $pdf->download("venta_{$sale->id}.pdf");
 
     }
+
+    /**
+     * Formulario importación masiva de ventas (solo encabezados).
+     */
+    public function import(Request $request)
+    {
+    $this->authorize('sale.import');
+    return view('admin.sales.import');
+    }
 }

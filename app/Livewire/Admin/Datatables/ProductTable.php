@@ -14,9 +14,27 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProductTable extends DataTableComponent
 {
+    // Filtro de estado (activos / papelera / todos)
+    public string $estado = 'activos'; // activos|papelera|todos
+
+    public function mount(): void
+    {
+        // Permitir set por query param ?estado=papelera
+        $estado = request()->query('estado');
+        if (in_array($estado, ['activos','papelera','todos'])) {
+            $this->estado = $estado;
+        }
+    }
+
        public function builder(): Builder
     {
-        return Product::query()->with(['category', 'images']);
+    $query = Product::query()->where('type','product')->with(['category', 'images']);
+
+        return match ($this->estado) {
+            'papelera' => $query->onlyTrashed(),
+            'todos'    => $query->withTrashed(),
+            default    => $query,
+        };
     }
     
 
@@ -69,7 +87,6 @@ class ProductTable extends DataTableComponent
 
             Column::make("Acciones")
                 ->label(function($row){
-
                     return view('admin.products.actions', ['product' => $row]);
 
                      })

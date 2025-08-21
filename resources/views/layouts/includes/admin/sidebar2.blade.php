@@ -19,7 +19,7 @@
             'name'     => 'Catálogo',
             'icon'     => 'fa-solid fa-tags',
             'href'     => '#',
-            'active'   => request()->routeIs('admin.categories.*') || request()->routeIs('admin.products.*') || request()->routeIs('admin.warehouses.*'),
+            'active'   => request()->routeIs('admin.categories.*') || request()->routeIs('admin.products.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.warehouses.*'),
             'children' => [
                 [
                     'name'   => 'Categorías',
@@ -32,6 +32,18 @@
                     'icon'   => 'fa-solid fa-box-open',
                     'href'   => route('admin.products.index'),
                     'active' => request()->routeIs('admin.products.*'),
+                ],
+                [
+                    'name'   => 'Servicios',
+                    'icon'   => 'fa-solid fa-concierge-bell',
+                    'href'   => route('admin.services.index'),
+                    'active' => request()->routeIs('admin.services.*'),
+                ],
+                [
+                    'name'   => 'Servicios',
+                    'icon'   => 'fa-solid fa-concierge-bell',
+                    'href'   => route('admin.services.index'),
+                    'active' => request()->routeIs('admin.services.*'),
                 ],
                 [
                     'name'   => 'Almacenes',
@@ -111,20 +123,14 @@
                 [
                     'name'   => 'Órdenes',
                     'icon'   => 'fa-solid fa-clipboard-list',
-                    'href'   => '',
-                    'active' => false,
+                    'href'   => route('admin.work-orders.index'),
+                    'active' => request()->routeIs('admin.work-orders.*'),
                 ],
                 [
-                    'name'   => 'Checkins',
-                    'icon'   => 'fa-solid fa-check',
-                    'href'   => '',
-                    'active' => false,
-                ],
-                [
-                    'name'   => 'Mapa',
-                    'icon'   => 'fa-solid fa-map',
-                    'href'   => '',
-                    'active' => false,
+                    'name'   => 'Gastos',
+                    'icon'   => 'fa-solid fa-receipt',
+                    'href'   => route('admin.expenses.index'),
+                    'active' => request()->routeIs('admin.expenses.index'),
                 ],
             ],
         ],

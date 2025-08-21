@@ -54,6 +54,9 @@ class SalesExport implements
             optional($sale->quote)->id,
             optional($sale->customer)->name,
             optional($sale->warehouse)->name,
+            number_format($sale->subtotal,2),
+            number_format($sale->discount_percent,2).'%',
+            number_format($sale->discount_amount,2),
             number_format($sale->total, 2),
             $sale->observation,
             $sale->created_at->format('d/m/Y'),
@@ -74,6 +77,9 @@ class SalesExport implements
             'Cotización ID',
             'Cliente',
             'Almacén',
+            'Subtotal',
+            'Desc %',
+            'Desc Monto',
             'Total',
             'Observación',
             'Creado el',
@@ -85,7 +91,8 @@ class SalesExport implements
      */
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:K1')->applyFromArray([
+    $lastCol = 'N';
+    $sheet->getStyle("A1:$lastCol"."1")->applyFromArray([
             'font' => [
                 'bold'  => true,
                 'color' => ['argb' => 'FFFFFFFF'],

@@ -20,25 +20,18 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Diego Beteta',
-            'email' => 'diegobeteta@distribuidorajadi.com',
-            'password' => bcrypt('Gama5649')
+     
 
-        ]);
-    
-
+        // Solo ejecutar RoleSeeder para crear usuario admin (Diego) + roles/permisos
         $this->call([
-            CategorySeeder::class,
-            IdentitySeeder::class,
-            ReasonSeeder::class,
+            RoleSeeder::class,
+            // CategorySeeder::class,
+            // IdentitySeeder::class,
+            // ReasonSeeder::class,
+            // WorkOrdersDemoSeeder::class,
+            // FullTinySeeder::class,
         ]);
 
-     Customer::factory(50)->create();
-     Supplier::factory(5)->create();
-     Warehouse::factory(2)->create();
-    Product::factory(100)->create();
-        
-    
+    // (DemoFullSeeder deprecated by FullTinySeeder)
     }
 }

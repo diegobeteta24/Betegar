@@ -130,17 +130,31 @@
         <thead>
             <tr>
                 <th style="width: 5%;">#</th>
-                <th style="width: 45%;">Producto</th>
-                <th style="width: 15%;">Cantidad</th>
-                <th style="width: 20%;">Precio Unitario</th>
-                <th style="width: 15%;">Subtotal</th>
+                <th style="width: 40%;">Producto</th>
+                <th style="width: 25%;">Descripción</th>
+                <th style="width: 10%;">Cant.</th>
+                <th style="width: 10%;">P. Unit</th>
+                <th style="width: 10%;">Subtotal</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($model->products as $i => $product)
                 <tr>
                     <td class="text-center">{{ $i + 1 }}</td>
-                    <td>{{ $product->name }}</td>
+                    <td>
+                        {{ $product->name }}
+                        @if($product->type === 'service')
+                            <small style="display:block;color:#555;margin-top:2px;">(Servicio)</small>
+                        @endif
+                    </td>
+                    <td>
+                        @php $desc = $product->pivot->description; @endphp
+                        @if($desc)
+                            <span style="white-space:pre-line; font-size:11px; color:#444;">{{ $desc }}</span>
+                        @else
+                            <span style="color:#999; font-size:11px;">—</span>
+                        @endif
+                    </td>
                     <td class="text-center">{{ $product->pivot->quantity }}</td>
                     <td class="text-right">Q/ {{ number_format($product->pivot->price, 2) }}</td>
                     <td class="text-right">Q/ {{ number_format($product->pivot->subtotal, 2) }}</td>

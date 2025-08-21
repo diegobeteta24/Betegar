@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
@@ -13,6 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        Gate::authorize('category.view', Category::class);
         return view('admin.categories.index');
     }
 
@@ -21,6 +23,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        Gate::authorize('category.create', Category::class);
         return view('admin.categories.create');
     }
 
@@ -29,6 +32,7 @@ class CategoryController extends Controller
      */
      public function store(Request $request)
     {
+        Gate::authorize('category.create', Category::class);
         // 1. Validar datos
         $data = $request->validate([
             'name'        => ['required', 'string', 'max:255', 'unique:categories,name'],
@@ -55,6 +59,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        Gate::authorize('category.update', $category);
         return view('admin.categories.edit', compact('category'));
     }
 
@@ -63,6 +68,7 @@ class CategoryController extends Controller
      */
    public function update(Request $request, Category $category)
     {
+        Gate::authorize('category.update', $category);
         // 1. Validar datos
         $data = $request->validate([
             'name'        => ['required', 'string', 'max:255', "unique:categories,name,{$category->id}"],
@@ -88,6 +94,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
 {
+        Gate::authorize('category.delete', $category);
     // 1. Verificar si tiene productos asociados
     if ($category->products()->exists()) {
         return redirect()
@@ -117,6 +124,8 @@ class CategoryController extends Controller
 }
  public function import(Request $request)
     {
+        Gate::authorize('category.create', Category::class);
+
        return view('admin.categories.import');
     }
 }
