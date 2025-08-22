@@ -34,8 +34,10 @@ use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\WorkOrderEntryController;
 use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 
+Route::middleware(['auth:sanctum','throttle:60,1'])->group(function(){
 Route::match(['GET','POST'],'/warehouses', function(Request $request) {
     return Warehouse::select('id','name','location as description')
         // 1) Excluir el origen primero
@@ -225,6 +227,7 @@ Route::match(['GET','POST'],'/reasons', function(Request $request) {
         ->orderBy('name')
         ->get();
 })->name('api.reasons.index');
+}); // end sanctum+throttle group
 
 // Admin expenses listing (with voucher) - requires admin role
 Route::middleware('auth:sanctum')->get('/admin/expenses', function(Request $request){
@@ -303,6 +306,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
         // Dashboard metrics (admin)
         Route::get('/dashboard/metrics', function(){
+            $cacheKey = 'dashboard_metrics_v1';
+            $data = Cache::remember($cacheKey, 60, function(){
             // Aggregate last 30 days sales & purchases
             $from = now()->subDays(29)->startOfDay();
             $dates = collect(range(0,29))->map(fn($i)=>$from->clone()->addDays($i)->format('Y-m-d'));
@@ -423,7 +428,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'balance'=>$a->current_balance,
             ]);
 
-            return response()->json([
+            return [
                 'generated_at'=>now()->format('H:i:s'),
                 'kpis'=>$kpis,
                 'sales_purchases'=>[
@@ -442,7 +447,9 @@ Route::middleware('auth:sanctum')->group(function () {
                     'open_invoices'=>$openInvoices,
                     'debtors'=>$debtorCustomers,
                 ],
-            ]);
+            ];
+            });
+            return response()->json($data);
         })->name('api.dashboard.metrics');
 
     // Entradas de órdenes

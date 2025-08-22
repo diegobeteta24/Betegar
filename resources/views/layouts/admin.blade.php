@@ -106,11 +106,13 @@
                         console.log('%c[DBG][select]','color:#b0f', i, snapshot, el);
                     });
                 }
-                document.addEventListener('alpine:init', ()=>{
-                    console.log('[DBG] alpine:init event (debug script)');
-                    setTimeout(()=>dumpSelectStates('post-alpine:init'),200);
-                });
-                window.addEventListener('load',()=>setTimeout(()=>dumpSelectStates('onload'),500));
+                if({{ config('app.debug') ? 'true' : 'false' }}){
+                    document.addEventListener('alpine:init', ()=>{
+                        console.log('[DBG] alpine:init event (debug script)');
+                        setTimeout(()=>dumpSelectStates('post-alpine:init'),200);
+                    });
+                    window.addEventListener('load',()=>setTimeout(()=>dumpSelectStates('onload'),500));
+                }
                 // Observe DOM mutations to detect addition of wireui_select components
                 const mo = new MutationObserver(muts=>{
                     let added=false;
@@ -151,7 +153,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/rappasoft/livewire-tables/css/laravel-livewire-tables-thirdparty.min.css') }}" />
     <script src="{{ asset('vendor/rappasoft/livewire-tables/js/laravel-livewire-tables.min.js') }}" data-order="pre-livewire"></script>
     <script src="{{ asset('vendor/rappasoft/livewire-tables/js/laravel-livewire-tables-thirdparty.min.js') }}" data-order="pre-livewire"></script>
-    <script src="{{ asset('vendor-wireui.js') }}" data-order="pre-livewire" onload="console.log('[Diag] vendor-wireui.js loaded (pre-livewire)')"></script>
+    <script src="{{ asset('vendor-wireui.js') }}" data-order="pre-livewire" @if(config('app.debug')) onload="console.log('[Diag] vendor-wireui.js loaded (pre-livewire)')" @endif></script>
     <script>
         // Defensa contra redefinición de $persist al iniciar Livewire
         if(window.Alpine && Object.getOwnPropertyDescriptor(window.Alpine,'$persist')){
@@ -186,15 +188,15 @@
             (function(){
                 const start = ()=>{
                     if(window.Livewire && !window.Livewire._started){
-                        try { window.Livewire.start(); console.log('[Init] Livewire.start() (admin)'); }
-                        catch(e){ console.error('[Init] Error Livewire.start()', e); }
+                        try { window.Livewire.start(); if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[Init] Livewire.start() (admin)'); }
+                        catch(e){ if({{ config('app.debug') ? 'true' : 'false' }}) console.error('[Init] Error Livewire.start()', e); }
                     }
                 };
                 if(window.Livewire) start(); else {
-                    let c=0, iv=setInterval(()=>{ if(window.Livewire){ clearInterval(iv); start(); } else if(++c>40){ clearInterval(iv); console.warn('[Init] Livewire no apareció'); } },50);
+                    let c=0, iv=setInterval(()=>{ if(window.Livewire){ clearInterval(iv); start(); } else if(++c>40){ clearInterval(iv); if({{ config('app.debug') ? 'true' : 'false' }}) console.warn('[Init] Livewire no apareció'); } },50);
                 }
                 document.addEventListener('livewire:init', ()=>{
-                    console.log('[Diag] livewire:init (admin)');
+                    if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[Diag] livewire:init (admin)');
                     if(window.Wireui?.dispatchHook) window.Wireui.dispatchHook('loaded');
                 });
             })();
@@ -226,14 +228,14 @@
                     const needsRegister = !reg || !reg.active || !reg.active.scriptURL.includes(version);
                     if(needsRegister){
                         navigator.serviceWorker.register(swUrl).then(r=>{
-                            console.log('[SW] registrado', r.scope, version);
-                        }).catch(e=>console.error('[SW] error registro', e));
+                            if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[SW] registrado', r.scope, version);
+                        }).catch(e=>{ if({{ config('app.debug') ? 'true' : 'false' }}) console.error('[SW] error registro', e); });
                     } else {
-                        console.log('[SW] ya activo', reg.scope, version);
+                        if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[SW] ya activo', reg.scope, version);
                     }
                 });
             } else {
-                console.warn('[SW] no soportado en este navegador');
+                if({{ config('app.debug') ? 'true' : 'false' }}) console.warn('[SW] no soportado en este navegador');
             }
         })();
     </script>

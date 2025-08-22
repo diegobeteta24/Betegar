@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/rappasoft/livewire-tables/css/laravel-livewire-tables-thirdparty.min.css') }}" />
     <script src="{{ asset('vendor/rappasoft/livewire-tables/js/laravel-livewire-tables.min.js') }}" data-order="pre-livewire"></script>
     <script src="{{ asset('vendor/rappasoft/livewire-tables/js/laravel-livewire-tables-thirdparty.min.js') }}" data-order="pre-livewire"></script>
-    <script src="{{ asset('vendor-wireui.js') }}" data-order="pre-livewire" onload="console.log('[Diag] vendor-wireui.js loaded (pre-livewire app)')"></script>
+    <script src="{{ asset('vendor-wireui.js') }}" data-order="pre-livewire" @if(config('app.debug')) onload="console.log('[Diag] vendor-wireui.js loaded (pre-livewire app)')" @endif></script>
     <script>
         // Defensa: si algún script definió Alpine.persist como propiedad no configurable,
         // intentamos eliminarla antes de que Livewire vuelva a definir $persist.
@@ -103,9 +103,9 @@
     <script src="{{ asset('livewire-vendor.js') }}" data-origin="static"></script>
     <script>
         (function(){
-            const start=()=>{ if(window.Livewire && !window.Livewire._started){ try{ window.Livewire.start(); console.log('[Init] Livewire.start() (app)'); }catch(e){ console.error('[Init] Error Livewire.start() (app)', e);} } };
-            if(window.Livewire) start(); else { let c=0, iv=setInterval(()=>{ if(window.Livewire){ clearInterval(iv); start(); } else if(++c>40){ clearInterval(iv); console.warn('[Init] Livewire no apareció (app)'); } },50); }
-            document.addEventListener('livewire:init',()=>{ console.log('[Diag] livewire:init (app)'); if(window.Wireui?.dispatchHook) window.Wireui.dispatchHook('loaded'); });
+            const start=()=>{ if(window.Livewire && !window.Livewire._started){ try{ window.Livewire.start(); if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[Init] Livewire.start() (app)'); }catch(e){ if({{ config('app.debug') ? 'true' : 'false' }}) console.error('[Init] Error Livewire.start() (app)', e);} } };
+            if(window.Livewire) start(); else { let c=0, iv=setInterval(()=>{ if(window.Livewire){ clearInterval(iv); start(); } else if(++c>40){ clearInterval(iv); if({{ config('app.debug') ? 'true' : 'false' }}) console.warn('[Init] Livewire no apareció (app)'); } },50); }
+            document.addEventListener('livewire:init',()=>{ if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[Diag] livewire:init (app)'); if(window.Wireui?.dispatchHook) window.Wireui.dispatchHook('loaded'); });
         })();
     </script>
     {{-- Registro de Service Worker (igual que admin) para permitir push si el usuario navega en layout app --}}
@@ -117,8 +117,8 @@
                 navigator.serviceWorker.getRegistration().then(reg=>{
                     const needs=!reg || !reg.active || !reg.active.scriptURL.includes(version);
                     if(needs){
-                        navigator.serviceWorker.register(swUrl).then(r=>console.log('[SW][app] registrado',r.scope,version)).catch(e=>console.error('[SW][app] error',e));
-                    } else { console.log('[SW][app] ya activo',reg.scope,version); }
+                        navigator.serviceWorker.register(swUrl).then(r=>{ if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[SW][app] registrado',r.scope,version); }).catch(e=>{ if({{ config('app.debug') ? 'true' : 'false' }}) console.error('[SW][app] error',e); });
+                    } else { if({{ config('app.debug') ? 'true' : 'false' }}) console.log('[SW][app] ya activo',reg.scope,version); }
                 });
             }
         })();
