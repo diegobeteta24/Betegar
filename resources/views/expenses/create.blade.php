@@ -82,8 +82,8 @@
                                         throw new Error('Error ' + res.status + ': ' + t);
                                     }
                                     await res.json();
-                                    alert('Gasto registrado');
-                                    window.location.href = '/';
+                                    // Redirigir directamente al dashboard del técnico (sin alert bloqueante)
+                                    window.location.replace('{{ route('dashboard') }}');
                                 } catch(err){
                                     console.error('Error registrando gasto', err);
                                     alert('No se pudo registrar el gasto: ' + err.message);
