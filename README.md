@@ -1,10 +1,10 @@
 # Betegar - Sistema de Gestión Empresarial
 
-Betegar es un sistema integral de gestión empresarial diseñado para optimizar y automatizar los procesos administrativos de su negocio. Esta plataforma web moderna proporciona herramientas completas para el manejo de inventarios, ventas, compras, finanzas y administración general.
+Betegar es un sistema integral de gestión empresarial diseñado para optimizar y automatizar los procesos administrativos de su negocio. Esta plataforma web moderna proporciona herramientas completas para el manejo de inventarios, ventas, compras, finanzas, órdenes de trabajo y gestión de técnicos en campo.
 
 ## Descripción General
 
-Betegar es una solución robusta y escalable que centraliza todas las operaciones comerciales de su empresa en una sola plataforma. El sistema está diseñado para facilitar la toma de decisiones estratégicas mediante el acceso inmediato a información actualizada y reportes detallados.
+Betegar es una solución robusta y escalable que centraliza todas las operaciones comerciales de su empresa en una sola plataforma. El sistema está diseñado para facilitar la toma de decisiones estratégicas mediante el acceso inmediato a información actualizada y reportes detallados. Con capacidades avanzadas de gestión de servicios técnicos, notificaciones en tiempo real y funcionalidad móvil PWA, Betegar se adapta tanto a operaciones de oficina como a trabajo en campo.
 
 ## Características Principales
 
@@ -18,11 +18,14 @@ Betegar es una solución robusta y escalable que centraliza todas las operacione
 
 ### 💰 Sistema Bancario y Financiero
 - Gestión de cuentas bancarias múltiples
-- Control de transacciones financieras
+- Control de transacciones financieras con categorización
 - Seguimiento de ingresos y egresos
-- Categorización de gastos
+- Categorización avanzada de gastos
+- Integración de débitos bancarios como gastos
 - Reportes financieros detallados
 - Control de flujo de caja
+- Transferencias entre cuentas
+- Dashboard financiero en tiempo real
 
 ### 📦 Gestión de Productos y Categorías
 - Catálogo completo de productos
@@ -44,6 +47,23 @@ Betegar es una solución robusta y escalable que centraliza todas las operacione
 - Control de recepción de mercancías
 - Seguimiento de pagos a proveedores
 
+### 🔧 Gestión de Órdenes de Trabajo
+- Sistema completo de órdenes de trabajo
+- Asignación de técnicos a servicios
+- Seguimiento de progreso en tiempo real
+- Registro de avances con imágenes y firmas digitales
+- Notificaciones push para técnicos y administradores
+- Control de gastos por orden de trabajo
+- Historial detallado de actividades
+
+### 👨‍🔧 Gestión de Técnicos
+- Sesiones de trabajo y seguimiento de ubicación
+- Registro de gastos de campo
+- Asignación automática de órdenes de trabajo
+- Notificaciones en tiempo real
+- Control de horas trabajadas
+- Reportes de productividad
+
 ### 👥 Gestión de Clientes y Usuarios
 - Base de datos de clientes
 - Historial de compras por cliente
@@ -59,11 +79,17 @@ Betegar es una solución robusta y escalable que centraliza todas las operacione
 - Reportes personalizables
 
 ### 🔧 Características Técnicas
-- Interfaz web responsiva (PWA)
+- Aplicación Web Progresiva (PWA) con funcionalidad offline
+- Notificaciones push en tiempo real
+- Interfaz web responsiva optimizada para móviles
 - Acceso desde cualquier dispositivo
+- Instalable como aplicación móvil
 - Sincronización en tiempo real
+- Service Worker para cacheo inteligente
 - Backup automático de datos
-- Seguridad avanzada
+- Seguridad avanzada con autenticación 2FA
+- Captura de firmas digitales
+- Geolocalización para técnicos
 
 ## Instalación
 
@@ -140,13 +166,44 @@ El sistema estará disponible en `http://localhost:8000`
 - Configure el servidor de correo en el archivo `.env` para el envío de notificaciones
 - Ajuste los permisos de las carpetas `storage` y `bootstrap/cache`
 - Configure las tareas programadas (cron jobs) para el mantenimiento automático
+- Configure las notificaciones push para móviles (opcional)
+
+### Instalación como PWA (Aplicación Móvil)
+
+Betegar puede instalarse como una aplicación móvil nativa:
+
+**En dispositivos móviles:**
+1. Abra el sistema en su navegador móvil
+2. Busque la opción "Añadir a pantalla de inicio" o "Instalar aplicación"
+3. Confirme la instalación
+
+**En computadoras:**
+1. Abra el sistema en Chrome, Edge o Safari
+2. Busque el ícono de instalación en la barra de direcciones
+3. Haga clic en "Instalar Betegar"
+
+La aplicación instalada funcionará offline y recibirá notificaciones push.
 
 ## Uso del Sistema
 
+### Configuración Inicial
 1. **Primer Acceso**: Acceda al sistema con las credenciales de administrador predeterminadas
 2. **Configuración Inicial**: Complete la configuración de la empresa, almacenes y categorías
 3. **Importación de Datos**: Utilice las herramientas de importación para cargar productos y clientes
-4. **Operación Diaria**: Comience a registrar ventas, compras y movimientos de inventario
+4. **Configuración de Técnicos**: Registre técnicos y configure permisos de acceso
+
+### Operación Diaria
+1. **Gestión de Inventarios**: Registre entradas, salidas y transferencias de productos
+2. **Procesamiento de Ventas**: Genere cotizaciones, procese ventas y gestione pagos
+3. **Órdenes de Trabajo**: Cree, asigne y dé seguimiento a órdenes de servicio
+4. **Control Financiero**: Registre transacciones bancarias y categorice gastos
+5. **Seguimiento de Técnicos**: Monitoree el progreso de servicios en campo
+
+### Funcionalidades Móviles
+- **Aplicación PWA**: Instale la aplicación en dispositivos móviles
+- **Trabajo Offline**: Continúe trabajando sin conexión a internet
+- **Notificaciones Push**: Reciba alertas importantes en tiempo real
+- **Firmas Digitales**: Capture firmas de clientes directamente en dispositivos móviles
 
 ## Soporte y Documentación
 
