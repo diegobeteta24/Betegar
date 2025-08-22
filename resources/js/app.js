@@ -75,10 +75,11 @@ function urlBase64ToUint8Array(base64String){
 }
 
 // Wait for SW registration (existing sw.js) then request notification permission lazily
-if('Notification' in window){
+// Only attempt push if user is authenticated (meta user-auth=1 set in authenticated layouts)
+const __USER_AUTH = document.querySelector('meta[name="user-auth"]')?.content === '1';
+if(__USER_AUTH && 'Notification' in window){
 	if(Notification.permission === 'granted') initPush();
 	else if(Notification.permission === 'default'){
-		// Ask after a short delay to avoid blocking initial load
 		setTimeout(async ()=>{
 			try { const res = await Notification.requestPermission(); if(res==='granted') initPush(); } catch(_e){}
 		}, 4000);
