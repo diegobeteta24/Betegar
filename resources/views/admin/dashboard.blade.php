@@ -129,12 +129,6 @@
         }
     </script>
     <div class="dashboard-wrapper h-[calc(100vh-6rem)] flex flex-col overflow-hidden" x-data="dashboard()" x-init="init()">
-        <div class="flex justify-end mb-2 flex-shrink-0">
-            <button type="button" class="px-3 py-1.5 text-xs rounded bg-blue-600 text-white hover:bg-blue-500"
-                onclick="fetch('{{ route('admin.push.test') }}',{headers:{'Accept':'application/json'}}).then(r=>r.json()).then(d=>alert('Push test '+(d.ok?'enviado':'falló'))).catch(()=>alert('Error enviando test')));">
-                Probar Push
-            </button>
-        </div>
         <!-- KPI CARDS -->
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 flex-shrink-0">
             <template x-for="card in kpis" :key="card.key">
