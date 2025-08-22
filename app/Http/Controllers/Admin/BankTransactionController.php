@@ -37,7 +37,8 @@ class BankTransactionController extends Controller
     public function create()
     {
         $accounts = BankAccount::orderBy('name')->get(['id','name','currency']);
-        return view('admin.bank_transactions.create', compact('accounts'));
+        $categories = \App\Models\ExpenseCategory::orderBy('name')->get(['id','name']);
+        return view('admin.bank_transactions.create', compact('accounts', 'categories'));
     }
 
     /**
@@ -45,12 +46,13 @@ class BankTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'bank_account_id' => ['required','exists:bank_accounts,id'],
-            'mode'            => ['required','in:income,expense'], // income = crédito libre, expense = débito
-            'amount'          => ['required','numeric','min:0.01'],
-            'description'     => ['nullable','string','max:255'],
-        ]);
+            $data = $request->validate([
+                'bank_account_id' => ['required','exists:bank_accounts,id'],
+                'mode'            => ['required','in:income,expense'], // income = crédito libre, expense = débito
+                'amount'          => ['required','numeric','min:0.01'],
+                'description'     => ['nullable','string','max:255'],
+                'category_id'     => ['nullable','exists:expense_categories,id'],
+            ]);
 
         return DB::transaction(function() use ($data) {
             $account = BankAccount::lockForUpdate()->findOrFail($data['bank_account_id']);
@@ -63,6 +65,7 @@ class BankTransactionController extends Controller
                 'date'                 => now(),
                 'amount'               => $data['amount'],
                 'description'          => $data['description'] ?: ($data['mode'] === 'income' ? 'Ingreso manual' : 'Gasto manual'),
+                'category_id'          => $data['category_id'] ?? null,
             ]);
 
             return redirect()->route('admin.bank-transactions.index')

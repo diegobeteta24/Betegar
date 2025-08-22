@@ -18,7 +18,7 @@ class ServicesImport implements ToCollection, WithHeadingRow
         foreach($rows as $index=>$row){
             $data = $row->toArray();
             $validator = Validator::make($data,[
-                'name'=>'required|string|max:255',
+                'name'=>'required|string|max:255|unique:products,name',
                 'description'=>'nullable|string',
                 'category_id'=>'required|exists:categories,id',
                 'price'=>'required|numeric|min:0',

@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 
 class ProductController extends Controller
@@ -35,9 +36,13 @@ class ProductController extends Controller
      */
      public function store(Request $request)
     {
+        // Normaliza espacios
+        if ($request->has('name')) {
+            $request->merge(['name' => trim($request->string('name'))]);
+        }
         // 1. Validar datos
         $data = $request->validate([
-            'name'         => ['required','string','max:255'],
+            'name'         => ['required','string','max:255', Rule::unique('products', 'name')],
             'description'  => ['nullable','string','max:1000'],
             'price'        => ['required','numeric','min:0'],
             'category_id'  => ['required','exists:categories,id'],
@@ -76,9 +81,12 @@ class ProductController extends Controller
      */
    public function update(Request $request, Product $product)
     {
+        if ($request->has('name')) {
+            $request->merge(['name' => trim($request->string('name'))]);
+        }
         // 1. Validar datos
         $data = $request->validate([
-            'name'        => ['required','string','max:255'],
+            'name'        => ['required','string','max:255', Rule::unique('products', 'name')->ignore($product->id)],
             'description' => ['nullable','string','max:1000'],
             'price'       => ['required','numeric','min:0'],
             'category_id' => ['required','exists:categories,id'],

@@ -23,7 +23,7 @@ class ProductsImport implements ToCollection, WithHeadingRow
             $data = $row->toArray();
 
             $validator= Validator::make($data, [
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255|unique:products,name',
                 'description' => 'nullable|string',
                 'sku' => 'nullable|string|max:100|unique:products,sku',
                 'price' => 'required|numeric|min:0',

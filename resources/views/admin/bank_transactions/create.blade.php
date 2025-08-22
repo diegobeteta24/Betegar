@@ -25,6 +25,14 @@
                         <option value="expense">Gasto (Débito)</option>
                     </x-wire-native-select>
                 </div>
+                    <div>
+                        <x-wire-native-select label="Categoría" name="category_id">
+                            <option value="">-- Sin categoría --</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </x-wire-native-select>
+                    </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <x-wire-input label="Monto" name="amount" type="number" step="0.01" min="0.01" required />

@@ -14,18 +14,19 @@ class ReasonSeeder extends Seeder
     public function run(): void
     {
         $reasons = [
-            // Reasons for incoming movements
-          
-            ['name' => 'Devolución del cliente', 'type' => 1],
-            ['name' => 'Ajuste de inventario', 'type' => 1],
-           
-            // Reasons for outgoing movements
-            
-            ['name' => 'Devolución de venta', 'type' => 2],
-            ['name' => 'Ajuste de inventario', 'type' => 2],
-            ['name' => 'Gasto interno', 'type' => 2],
+            // Entradas (1)
+            ['name' => 'Compra a proveedor', 'type' => 1],
+            ['name' => 'Devolución de cliente', 'type' => 1],
+            ['name' => 'Ajuste positivo de inventario', 'type' => 1],
+            ['name' => 'Traspaso desde otro almacén', 'type' => 1],
+            ['name' => 'Producción/ensamblaje', 'type' => 1],
 
-            
+            // Salidas (2)
+            ['name' => 'Venta a cliente', 'type' => 2],
+            ['name' => 'Devolución a proveedor', 'type' => 2],
+            ['name' => 'Ajuste negativo de inventario', 'type' => 2],
+            ['name' => 'Traspaso a otro almacén', 'type' => 2],
+            ['name' => 'Consumo interno / merma', 'type' => 2],
         ];
 
         foreach ($reasons as $reason) {

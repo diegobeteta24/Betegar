@@ -80,15 +80,7 @@ class SalePaymentController extends Controller
             return $payment;
         });
 
-        return redirect()
-            ->route('admin.sales.payments.pdf', $payment)
-            ->with('sweet-alert', [
-                'icon'  => 'success',
-                'title' => 'Pago registrado',
-                'text'  => 'Se generó el recibo de pago en PDF.',
-                'timer' => 2500,
-                'showConfirmButton' => false,
-            ]);
+    return view('admin.sales.payments.after_payment', compact('payment'));
     }
 
     /**

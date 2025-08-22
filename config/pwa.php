@@ -30,11 +30,8 @@ return [
         'description' => 'Toda tu info en un solo lugar',
         'theme_color' => '#ef1515ff',
         'icons' => [
-            [
-                'src' => 'images/logo.png',
-                'sizes' => '512x512',
-                'type' => 'image/png',
-            ],
+            ['src' => 'images/pwa-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
+            ['src' => 'images/pwa-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
         ],
     ],
 

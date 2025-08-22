@@ -16,6 +16,7 @@ class BankTransaction extends Model
         'date',
         'amount',
         'description',
+        'category_id',
         'origin_type',
         'origin_id',
     ];

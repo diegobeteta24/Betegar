@@ -211,7 +211,7 @@ Route::match(['GET','POST'],'/quotes', function(Request $request) {
 
 //Reason api
 Route::match(['GET','POST'],'/reasons', function(Request $request) {
-    return Reason::select('id','name')
+    return Reason::select('id','name','type')
         ->when($request->search, function($query,$search) {
             $query->where('name','like',"%{$search}%");
         })
@@ -219,7 +219,10 @@ Route::match(['GET','POST'],'/reasons', function(Request $request) {
             fn($query) => $query->whereIn('id',$request->input('selected', [])),
             fn($query) => $query->limit(10)
         )
-        ->where('type', $request->input('type', '')) // Default to type 1 if not provided
+        ->when($request->filled('type'), function($q) use ($request){
+            $q->where('type', (int) $request->input('type'));
+        })
+        ->orderBy('name')
         ->get();
 })->name('api.reasons.index');
 
@@ -350,7 +353,10 @@ Route::middleware('auth:sanctum')->group(function () {
             $sales30 = $salesSeries->sum();
             $purch30 = $purchSeries->sum();
             $payments30 = \App\Models\SalePayment::where('paid_at','>=',$from)->sum('amount');
-            $expenses30 = \App\Models\Expense::where('created_at','>=',$from)->sum('amount');
+            // Combine manual expenses + bank debits as expenses
+            $manualExpenses30 = \App\Models\Expense::where('created_at','>=',$from)->sum('amount');
+            $bankDebits30 = \App\Models\BankTransaction::where('date','>=',$from)->where('type','debit')->sum('amount');
+            $expenses30 = (float)$manualExpenses30 + (float)$bankDebits30;
 
             $kpis = [
                 ['key'=>'sales','label'=>'Ventas 30d','value'=>$sales30,'trend'=>0,'icon'=>'fa-solid fa-cart-shopping','format'=>'money'],
@@ -375,13 +381,30 @@ Route::middleware('auth:sanctum')->group(function () {
             $tpLabels = $topProducts->map(fn($r)=>$prodModels[$r->product_id]->name ?? ('Prod '.$r->product_id));
             $tpValues = $topProducts->pluck('q')->map(fn($v)=>(int)$v);
 
-            // Expenses by category
-            $expCat = \App\Models\Expense::where('created_at','>=',$from)
+            // Expenses by category: merge technician expenses + bank transaction debits
+            $expCatManual = \App\Models\Expense::where('created_at','>=',$from)
                 ->selectRaw('expense_category_id cid, SUM(amount) s')
                 ->groupBy('cid')->get();
-            $catModels = \App\Models\ExpenseCategory::whereIn('id',$expCat->pluck('cid'))->get()->keyBy('id');
-            $ecLabels = $expCat->map(fn($r)=> $catModels[$r->cid]->name ?? 'Otros');
-            $ecValues = $expCat->pluck('s')->map(fn($v)=>(float)$v);
+            $expCatBank = \App\Models\BankTransaction::where('date','>=',$from)
+                ->where('type','debit')
+                ->selectRaw('category_id cid, SUM(amount) s')
+                ->groupBy('cid')->get();
+
+            $combinedByCat = collect();
+            foreach([$expCatManual, $expCatBank] as $set){
+                foreach($set as $row){
+                    $cid = $row->cid; $sum = (float)$row->s;
+                    $combinedByCat[$cid] = ($combinedByCat[$cid] ?? 0) + $sum;
+                }
+            }
+            $catIds = $combinedByCat->keys()->filter(fn($id)=>!is_null($id))->values();
+            $catModels = \App\Models\ExpenseCategory::whereIn('id',$catIds)->get()->keyBy('id');
+            $ecLabels = [];
+            $ecValues = [];
+            foreach($combinedByCat as $cid=>$sum){
+                $label = $cid ? ($catModels[$cid]->name ?? 'Otros') : 'Otros';
+                $ecLabels[] = $label; $ecValues[] = (float)$sum;
+            }
 
             // Recent payments
             $recentPayments = \App\Models\SalePayment::with('sale')

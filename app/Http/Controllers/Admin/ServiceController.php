@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product; // usamos misma tabla
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ServiceController extends Controller
 {
@@ -22,8 +23,11 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('name')) {
+            $request->merge(['name' => trim($request->string('name'))]);
+        }
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
+            'name' => ['required','string','max:255', Rule::unique('products','name')],
             'description' => ['nullable','string','max:1000'],
             'price' => ['required','numeric','min:0'],
             'category_id' => ['required','exists:categories,id'],
@@ -51,8 +55,11 @@ class ServiceController extends Controller
     public function update(Request $request, Product $service)
     {
         abort_unless($service->type === 'service', 404);
+        if ($request->has('name')) {
+            $request->merge(['name' => trim($request->string('name'))]);
+        }
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
+            'name' => ['required','string','max:255', Rule::unique('products','name')->ignore($service->id)],
             'description' => ['nullable','string','max:1000'],
             'price' => ['required','numeric','min:0'],
             'category_id' => ['required','exists:categories,id'],

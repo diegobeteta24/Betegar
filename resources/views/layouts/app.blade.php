@@ -21,6 +21,10 @@
     @endif
 
     <title>{{ $pageTitle }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/pwa-192.png') }}">
+    <link rel="mask-icon" href="{{ asset('logo.png') }}" color="#ef1515">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
