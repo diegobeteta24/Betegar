@@ -236,8 +236,8 @@
             @media (max-width: 1024px){
                 .dashboard-wrapper{ height:auto; }
             }
-        </style>
             .dark .border-purple-200{border-color:rgba(168,85,247,.4)}
             .dark .border-amber-200{border-color:rgba(245,158,11,.4)}
+        </style>
     @endpush
 </x-admin-layout>
