@@ -538,14 +538,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/admin/fund-transfers', [\App\Http\Controllers\Admin\FundTransferController::class, 'store']);
     Route::delete('/admin/fund-transfers/{fundTransfer}', [\App\Http\Controllers\Admin\FundTransferController::class, 'destroy']);
 
-        // Listado de cuentas bancarias para seleccionar origen de fondos (solo admin)
-        Route::get('/bank-accounts', function(){
+        // Listado de cuentas bancarias para selects (solo admin)
+        Route::match(['GET','POST'],'/bank-accounts', function(){
             return \App\Models\BankAccount::orderBy('name')->get()->map(fn($a)=>[
                 'id' => $a->id,
                 'name' => $a->name,
                 'balance' => number_format($a->current_balance,2,'.',''),
             ]);
-        });
+        })->name('api.bank-accounts.index');
 
         // Admin: tracking de sesiones y ubicaciones
         Route::get('/admin/technicians/{technician}/sessions', [\App\Http\Controllers\Admin\TechnicianTrackingController::class, 'sessions']);
