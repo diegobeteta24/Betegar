@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Datatables;
 
 use App\Models\BankTransaction;
 use App\Models\BankAccount;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -19,7 +20,19 @@ class BankTransactionTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        return BankTransaction::query()->with(['account']);
+        // Include a running balance per account at the moment of each transaction (saldo luego de aplicar el movimiento)
+        // MySQL 8+ window function to compute cumulative sum per account ordered by date, id
+        $running = "(
+            `bank_accounts`.`initial_balance` +
+            SUM(CASE WHEN `bank_transactions`.`type` = 'credit' THEN `bank_transactions`.`amount` ELSE -`bank_transactions`.`amount` END)
+            OVER (PARTITION BY `bank_transactions`.`bank_account_id` ORDER BY `bank_transactions`.`date`, `bank_transactions`.`id`)
+        )";
+
+        return BankTransaction::query()
+            ->select('bank_transactions.*')
+            ->addSelect(DB::raw($running.' as balance_after'))
+            ->join('bank_accounts','bank_accounts.id','=','bank_transactions.bank_account_id')
+            ->with(['account']);
     }
 
     public function configure(): void
@@ -62,6 +75,9 @@ class BankTransactionTable extends DataTableComponent
             Column::make('Tipo', 'type')->sortable(),
             Column::make('Monto', 'amount')
                 ->format(fn($value) => 'Q '.number_format((float)$value, 2))
+                ->sortable(),
+            Column::make('Saldo', 'balance_after')
+                ->label(fn($row) => 'Q '.number_format((float)($row->balance_after ?? 0), 2))
                 ->sortable(),
             Column::make('Descripción', 'description')
                 ->searchable(),
