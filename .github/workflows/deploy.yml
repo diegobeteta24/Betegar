@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - name: Install frontend deps
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: Build assets
         run: npm run build
       - name: Upload build artifact
@@ -28,6 +28,7 @@ jobs:
         with:
           name: public-build
           path: public/build/**
+          if-no-files-found: error
 
   deploy:
     needs: build-assets
@@ -45,7 +46,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           source: public/build/*
           target: ${{ secrets.APP_DIR }}/public/build
 
@@ -55,10 +56,11 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           script_stop: true
           script: |
             set -e
+            APP_DIR="${{ secrets.APP_DIR }}"
             cd "$APP_DIR"
             php -v
             echo '→ Enable maintenance mode'

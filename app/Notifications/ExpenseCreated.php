@@ -29,8 +29,8 @@ class ExpenseCreated extends Notification
         return (new WebPushMessage)
             ->title('Nuevo gasto registrado')
             ->body($this->technicianName . ' registró Q' . number_format($this->amount,2) . ' - ' . ($this->description ?: 'Sin descripción'))
-            ->icon(asset('images/logo.png'))
-            ->badge(asset('images/logo.png'))
+            ->icon(asset('logo.png'))
+            ->badge(asset('logo.png'))
             ->data([
                 'url' => $url,
                 'expense_id' => $this->expenseId,

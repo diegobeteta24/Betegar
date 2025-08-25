@@ -29,8 +29,8 @@ class WorkOrderCreated extends Notification
         return (new WebPushMessage)
             ->title('Nueva Orden de Trabajo')
             ->body('Cliente: '.$this->customerName.' | Técnicos: '.$techs)
-            ->icon(asset('images/logo.png'))
-            ->badge(asset('images/logo.png'))
+            ->icon(asset('logo.png'))
+            ->badge(asset('logo.png'))
             ->data([
                 'url' => $url,
                 'work_order_id' => $this->orderId,

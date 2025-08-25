@@ -45,8 +45,8 @@ class TechnicianEvent extends Notification
         ];
         return (new WebPushMessage)
             ->title($this->title)
-            ->icon(asset('images/logo.png'))
-            ->badge(asset('images/logo.png'))
+            ->icon(asset('logo.png'))
+            ->badge(asset('logo.png'))
             ->body($this->body)
             ->vibrate([100,50,100])
             ->tag($tag)

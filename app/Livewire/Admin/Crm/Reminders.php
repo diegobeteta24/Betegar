@@ -8,6 +8,7 @@ use App\Models\Quote;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\ReminderCreated;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Notification;
 
 class Reminders extends Component
 {
@@ -54,16 +55,24 @@ class Reminders extends Component
             if($rem->remind_at){
                 $gtz = config('app.tz_guatemala','America/Guatemala');
                 $when = $rem->remind_at->copy()->timezone($gtz);
-                // Si la hora está en el pasado, manda inmediatamente
-                $delay = $when->isPast() ? now() : $when;
-                Auth::user()->notify((new ReminderCreated(
-                    'Recordatorio',
-                    ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
-                    $rem->id
-                ))->delay($delay));
+                // Si la hora está en el pasado, envía ahora mismo (sin cola)
+                if ($when->isPast()) {
+                    Notification::sendNow(Auth::user(), new ReminderCreated(
+                        'Recordatorio',
+                        ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
+                        $rem->id
+                    ));
+                } else {
+                    // Futuro -> se envía encola con delay
+                    Auth::user()->notify((new ReminderCreated(
+                        'Recordatorio',
+                        ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
+                        $rem->id
+                    ))->delay($when));
+                }
             } else {
-                // Sin fecha -> inmediato
-                Auth::user()->notify(new ReminderCreated(
+                // Sin fecha -> inmediato (sin cola)
+                Notification::sendNow(Auth::user(), new ReminderCreated(
                     'Recordatorio (sin fecha)',
                     $rem->notes ?: 'Recordatorio creado',
                     $rem->id

@@ -34,7 +34,8 @@ class ReminderCreated extends Notification implements ShouldQueue
      */
     public function toWebPush(object $notifiable, object $notification): WebPushMessage
     {
-        $url = route('admin.crm.reminders.index');
+        // Build target URL for the reminders page (fallback to admin dashboard if route not available)
+        $url = url('/admin/crm/reminders');
         $tag = 'reminder-'.$this->reminderId;
         $actions = [
             ['action' => 'open', 'title' => 'Ver'],
@@ -42,8 +43,8 @@ class ReminderCreated extends Notification implements ShouldQueue
         ];
         return (new WebPushMessage)
             ->title($this->title)
-            ->icon(asset('images/logo.png'))
-            ->badge(asset('images/logo.png'))
+            ->icon(asset('logo.png'))
+            ->badge(asset('logo.png'))
             ->body($this->body)
             ->vibrate([200,80,200])
             ->tag($tag)
