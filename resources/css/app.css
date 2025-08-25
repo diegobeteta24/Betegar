@@ -1,22 +1,9 @@
 /* resources/css/app.css */
 
-/* 0) IMPORT de tema de Flowbite debe ir primero */
-@import "flowbite/src/themes/default";
-
-/* 1) Tailwind base */
+/* Tailwind v3 layers */
 @tailwind base;
-
-/* 2) Tailwind components */
 @tailwind components;
-
-/* 2.b) Plugin de Flowbite para generar sus componentes/utilities */
-@plugin "flowbite/plugin";
-
-/* 2.c) Fuente de los componentes de Flowbite */
-@source "../node_modules/flowbite";
-
-/* 3) Tailwind utilities */
 @tailwind utilities;
 
-/* tu regla x-cloak al final */
+/* Helpers */
 [x-cloak] { display: none; }
