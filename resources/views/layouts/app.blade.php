@@ -17,8 +17,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="user-auth" content="1">
     <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
-    @if(env('VAPID_PUBLIC_KEY'))
-        <meta name="vapid-public-key" content="{{ env('VAPID_PUBLIC_KEY') }}">
+    @php($vapid = config('webpush.vapid.public_key'))
+    @if($vapid)
+        <meta name="vapid-public-key" content="{{ $vapid }}">
+        <script>window.VAPID_PUBLIC_KEY = @json($vapid);</script>
     @endif
 
     <title>{{ $pageTitle }}</title>

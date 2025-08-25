@@ -77,6 +77,8 @@ function urlBase64ToUint8Array(base64String){
 // Wait for SW registration (existing sw.js) then request notification permission lazily
 // Only attempt push if user is authenticated (meta user-auth=1 set in authenticated layouts)
 const __USER_AUTH = document.querySelector('meta[name="user-auth"]')?.content === '1';
+// Expose for targeted pages to force subscription
+window.__initPush = initPush;
 if(__USER_AUTH && 'Notification' in window){
 	if(Notification.permission === 'granted') initPush();
 	else if(Notification.permission === 'default'){

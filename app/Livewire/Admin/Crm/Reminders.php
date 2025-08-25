@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\ReminderCreated;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log;
 
 class Reminders extends Component
 {
@@ -51,32 +52,47 @@ class Reminders extends Component
         $this->dispatch('swal', ['title' => 'Recordatorio creado', 'icon' => 'success']);
 
         // Programar notificación para la fecha/hora indicada (zona Guatemala)
-        if(Auth::user()){
-            if($rem->remind_at){
-                $gtz = config('app.tz_guatemala','America/Guatemala');
-                $when = $rem->remind_at->copy()->timezone($gtz);
-                // Si la hora está en el pasado, envía ahora mismo (sin cola)
-                if ($when->isPast()) {
-                    Notification::sendNow(Auth::user(), new ReminderCreated(
-                        'Recordatorio',
-                        ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
+        $user = Auth::user();
+        if($user){
+            try {
+                $hasVapid = (bool) config('webpush.vapid.public_key');
+                $hasSubs  = method_exists($user, 'pushSubscriptions') ? $user->pushSubscriptions()->exists() : false;
+                Log::info('[CRM][Reminder] Notif precheck', ['vapid'=>$hasVapid, 'subs'=>$hasSubs, 'user_id'=>$user->id]);
+                if(! $hasVapid || ! $hasSubs){
+                    $msg = ! $hasVapid ? 'Push no configurado (VAPID)' : 'Sin suscripción push activa';
+                    Log::warning('[CRM][Reminder] Not sending push: '.$msg, ['user_id'=>$user->id]);
+                    // Seguimos sin interrumpir la UX; el recordatorio se creó.
+                    return;
+                }
+
+                if($rem->remind_at){
+                    $gtz = config('app.tz_guatemala','America/Guatemala');
+                    $when = $rem->remind_at->copy()->timezone($gtz);
+                    if ($when->isPast()) {
+                        Notification::sendNow($user, new ReminderCreated(
+                            'Recordatorio',
+                            ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
+                            $rem->id
+                        ));
+                        Log::info('[CRM][Reminder] Push sent immediately', ['reminder_id'=>$rem->id, 'user_id'=>$user->id]);
+                    } else {
+                        $user->notify((new ReminderCreated(
+                            'Recordatorio',
+                            ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
+                            $rem->id
+                        ))->delay($when));
+                        Log::info('[CRM][Reminder] Push scheduled', ['reminder_id'=>$rem->id, 'when'=>$when->toIsoString(), 'user_id'=>$user->id]);
+                    }
+                } else {
+                    Notification::sendNow($user, new ReminderCreated(
+                        'Recordatorio (sin fecha)',
+                        $rem->notes ?: 'Recordatorio creado',
                         $rem->id
                     ));
-                } else {
-                    // Futuro -> se envía encola con delay
-                    Auth::user()->notify((new ReminderCreated(
-                        'Recordatorio',
-                        ($rem->notes ?: 'Recordatorio programado para ').$when->format('d/m/Y H:i'),
-                        $rem->id
-                    ))->delay($when));
+                    Log::info('[CRM][Reminder] Push sent immediate (no date)', ['reminder_id'=>$rem->id, 'user_id'=>$user->id]);
                 }
-            } else {
-                // Sin fecha -> inmediato (sin cola)
-                Notification::sendNow(Auth::user(), new ReminderCreated(
-                    'Recordatorio (sin fecha)',
-                    $rem->notes ?: 'Recordatorio creado',
-                    $rem->id
-                ));
+            } catch(\Throwable $e){
+                Log::error('[CRM][Reminder] Push error: '.$e->getMessage(), ['trace'=>$e->getTraceAsString()]);
             }
         }
     }
