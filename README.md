@@ -9,6 +9,11 @@
 - `tailwind.config.js` loads the WireUI preset only if `vendor/wireui/wireui/tailwind.config.js` exists.
 - This avoids build failures in CI where vendor is not present during the asset build stage.
 
+### Flowbite note
+
+- We pinned Flowbite to v2 and disabled its Tailwind plugin in `tailwind.config.js` for CI stability.
+- Re-enable by uncommenting the import and plugin entry once the Tailwind/Flowbite versions are aligned or when using Tailwind v4 and Flowbite v3+ with the new directives.
+
 # Betegar - Sistema de Gestión Empresarial
 
 Betegar es un sistema integral de gestión empresarial diseñado para optimizar y automatizar los procesos administrativos de su negocio. Esta plataforma web moderna proporciona herramientas completas para el manejo de inventarios, ventas, compras, finanzas, órdenes de trabajo y gestión de técnicos en campo.

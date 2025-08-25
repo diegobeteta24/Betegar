@@ -2,7 +2,8 @@
 import defaultTheme from 'tailwindcss/defaultTheme'
 import forms       from '@tailwindcss/forms'
 import typography  from '@tailwindcss/typography'
-import flowbite    from 'flowbite/plugin'
+// flowbite plugin disabled for CI stability; re-enable after locking versions
+// import flowbite    from 'flowbite/plugin'
 import { createRequire } from 'module'
 
 // Allow requiring CommonJS modules from ESM config
@@ -25,7 +26,7 @@ export default {
 
   content: [
     './resources/views/**/*.blade.php',
-    './node_modules/flowbite/**/*.js',       // para que Tailwind escanee las clases de Flowbite
+  // './node_modules/flowbite/**/*.js',     // disabled in CI
     './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php',
     './storage/framework/views/*.php',
     // Include WireUI sources only if vendor exists
@@ -46,6 +47,6 @@ export default {
   plugins: [
     forms,
     typography,
-    flowbite,       // <— aquí el plugin
+  // flowbite,     // disabled in CI
   ],
 }
