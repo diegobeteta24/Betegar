@@ -3,12 +3,24 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 import forms       from '@tailwindcss/forms'
 import typography  from '@tailwindcss/typography'
 import flowbite    from 'flowbite/plugin'
+import { createRequire } from 'module'
+
+// Allow requiring CommonJS modules from ESM config
+const require = createRequire(import.meta.url)
+
+// Make WireUI preset optional (CI may not have vendor installed during assets build)
+let wireuiPreset = null
+try {
+  require.resolve('./vendor/wireui/wireui/tailwind.config.js')
+  wireuiPreset = require('./vendor/wireui/wireui/tailwind.config.js')
+} catch (e) {
+  wireuiPreset = null
+}
 
 export default {
- presets: [
-      
-        require("./vendor/wireui/wireui/tailwind.config.js")
-    ],
+  presets: [
+    ...(wireuiPreset ? [wireuiPreset] : [])
+  ],
 
 
   content: [
@@ -16,11 +28,13 @@ export default {
     './node_modules/flowbite/**/*.js',       // para que Tailwind escanee las clases de Flowbite
     './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php',
     './storage/framework/views/*.php',
-    "./vendor/wireui/wireui/src/*.php",
-        "./vendor/wireui/wireui/ts/**/*.ts",
-        "./vendor/wireui/wireui/src/WireUi/**/*.php",
-        "./vendor/wireui/wireui/src/Components/**/*.php",
-    // etc...
+    // Include WireUI sources only if vendor exists
+    ...(wireuiPreset ? [
+      './vendor/wireui/wireui/src/*.php',
+      './vendor/wireui/wireui/ts/**/*.ts',
+      './vendor/wireui/wireui/src/WireUi/**/*.php',
+      './vendor/wireui/wireui/src/Components/**/*.php',
+    ] : []),
   ],
   theme: {
     extend: {

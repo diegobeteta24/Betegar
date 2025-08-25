@@ -4,6 +4,11 @@
 - If build step fails with `npm ci` not found or lockfile errors, we use `npm install` to be compatible with the current repo state (no `package-lock.json`).
 - Secrets required: `SSH_HOST`, `SSH_USER`, `SSH_KEY`, `APP_DIR`, `APP_URL` (and optionally `SSH_PORT`).
 
+### Tailwind + WireUI in CI
+
+- `tailwind.config.js` loads the WireUI preset only if `vendor/wireui/wireui/tailwind.config.js` exists.
+- This avoids build failures in CI where vendor is not present during the asset build stage.
+
 # Betegar - Sistema de Gestión Empresarial
 
 Betegar es un sistema integral de gestión empresarial diseñado para optimizar y automatizar los procesos administrativos de su negocio. Esta plataforma web moderna proporciona herramientas completas para el manejo de inventarios, ventas, compras, finanzas, órdenes de trabajo y gestión de técnicos en campo.
