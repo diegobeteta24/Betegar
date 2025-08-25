@@ -1,0 +1,98 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install frontend deps
+        run: npm ci
+      - name: Build assets
+        run: npm run build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-build
+          path: public/build/**
+
+  deploy:
+    needs: build-assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: public-build
+          path: public/build
+
+      - name: Copy built assets to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: public/build/*
+          target: ${{ secrets.APP_DIR }}/public/build
+
+      - name: Deploy on server (git pull + composer + migrate + optimize)
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            cd "$APP_DIR"
+            php -v
+            echo '→ Enable maintenance mode'
+            php artisan down || true
+            echo '→ Fetch latest code'
+            git fetch --all --quiet
+            git reset --hard origin/main
+            echo '→ Install composer (prod)'
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            echo '→ Run migrations'
+            php artisan migrate --force --no-interaction
+            echo '→ Cache config/routes/views'
+            php artisan optimize
+            echo '→ Link storage if missing'
+            php artisan storage:link || true
+            echo '→ Set permissions'
+            find storage bootstrap/cache -type d -exec chmod 775 {} +
+            find storage bootstrap/cache -type f -exec chmod 664 {} +
+            echo '→ Disable maintenance mode'
+            php artisan up
+
+      - name: Health check
+        shell: bash
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          set -e
+          for i in 1 2 3; do
+            code=$(curl -sk -o /dev/null -w "%{http_code}" "$APP_URL") || true
+            echo "Attempt $i → $code"
+            if [ "$code" = "200" ] || [ "$code" = "302" ]; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Health check failed" >&2
+          exit 1

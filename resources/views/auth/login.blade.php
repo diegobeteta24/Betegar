@@ -3,7 +3,7 @@
         {{-- Panel de bienvenida (solo en escritorio) --}}
         <div
             class="hidden lg:flex items-center justify-center bg-cover bg-center"
-            style="background-image: url('{{ asset('images/login-bg.jpg') }}'), linear-gradient(135deg,#0f172a,#1e293b)"
+            style="background-image: linear-gradient(135deg,#0f172a,#1e293b)"
         >
             <div class="bg-black bg-opacity-50 p-8 rounded-md text-white max-w-sm text-center">
                 <h2 class="text-3xl font-bold mb-4">Bienvenido a Betegar</h2>

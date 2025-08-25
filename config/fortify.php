@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+    // Registration disabled: only admin can create users
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),
